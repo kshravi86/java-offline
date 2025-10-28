@@ -19,8 +19,8 @@ jobs:
       P12_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
       P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
       PROVISIONING_PROFILE_BASE64: ${{ secrets.PROVISIONING_PROFILE_BASE64 }}
-      SCHEME: RustOffline
-      PROJECT: RustOffline.xcodeproj
+      SCHEME: java_offline
+      PROJECT: java_offline.xcodeproj
     steps:
       - name: Checkout
         uses: actions/checkout@v4
