@@ -1,0 +1,30 @@
+name: java_offline
+options:
+  minimumXcodeGenVersion: 2.38.0
+  deploymentTarget:
+    iOS: 15.0
+targets:
+  java_offline:
+    type: application
+    platform: iOS
+    sources:
+      - path: java_offline
+    info:
+      path: java_offline/Info.plist
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.java.offline
+      PRODUCT_NAME: java_offline
+      SWIFT_VERSION: 5.0
+      IPHONEOS_DEPLOYMENT_TARGET: 15.0
+schemes:
+  java_offline:
+    build:
+      targets:
+        java_offline: all
+    test:
+      gatherCoverageData: false
+    run:
+      config: Release
+    archive:
+      config: Release
+
