@@ -1,0 +1,40 @@
+name: Build iOS App
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up environment
+      run: |
+        # Select the latest available Xcode version
+        echo "Listing available Xcode versions:"
+        ls /Applications | grep "Xcode"
+        # Assuming a recent version is available, e.g., Xcode 15.3
+        # The runner environment will typically have a default selected, but this is safer.
+        # For a real project, you'd specify the exact version.
+        # Example: sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
+
+    - name: Build iOS App
+      run: |
+        # Note: This command requires a valid .xcodeproj file to exist.
+        # The project name is 'java_offline' and the scheme is assumed to be the same.
+        # The bundle ID is set to 'com.java.offline' as requested.
+        xcodebuild clean build \
+          -project java_offline/java_offline.xcodeproj \
+          -scheme java_offline \
+          -configuration Release \
+          -sdk iphoneos \
+          -destination 'generic/platform=iOS' \
+          CODE_SIGNING_ALLOWED=NO \
+          BUNDLE_IDENTIFIER=com.java.offline
