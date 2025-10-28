@@ -91,7 +91,9 @@ jobs:
           PP_UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' $RUNNER_TEMP/profile.plist)
           PP_NAME=$(/usr/libexec/PlistBuddy -c 'Print :Name' $RUNNER_TEMP/profile.plist)
           APPID=$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' $RUNNER_TEMP/profile.plist)
-          BUNDLE_ID=${APPID#.}\n          echo "PP_UUID=$PP_UUID" >> $GITHUB_ENV
+          # Extract pure bundle id from TEAMID.bundleid by stripping the TEAMID and the following dot
+          BUNDLE_ID=${APPID#*.}
+          echo "PP_UUID=$PP_UUID" >> $GITHUB_ENV
           echo "PP_NAME=$PP_NAME" >> $GITHUB_ENV
           echo "BUNDLE_ID=$BUNDLE_ID" >> $GITHUB_ENV
           echo "Using provisioning profile: $PP_NAME ($PP_UUID) for $BUNDLE_ID"

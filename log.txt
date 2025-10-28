@@ -1,0 +1,51 @@
+set -euo pipefail
+  # Try to read from build settings first
+  PROJECT_BUNDLE_ID=$(xcodebuild -project "$PROJECT" -scheme "$SCHEME" -showBuildSettings 2>/dev/null \
+    | awk '/PRODUCT_BUNDLE_IDENTIFIER/ {print $3; exit}' || true)
+  # Fallback: read from Info.plist (root CFBundleIdentifier), then legacy path used by some templates
+  if [ -z "${PROJECT_BUNDLE_ID:-}" ] || [ "$PROJECT_BUNDLE_ID" = "NO" ]; then
+    for INFO_PLIST_PATH in "java_offline/Info.plist" "Info.plist"; do
+      if [ -f "$INFO_PLIST_PATH" ]; then
+        PROJECT_BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$INFO_PLIST_PATH" 2>/dev/null || true)
+        if [ -z "${PROJECT_BUNDLE_ID:-}" ]; then
+          PROJECT_BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :ApplicationProperties:CFBundleIdentifier' "$INFO_PLIST_PATH" 2>/dev/null || true)
+        fi
+      fi
+      if [ -n "${PROJECT_BUNDLE_ID:-}" ]; then break; fi
+    done
+  fi
+  
+  # Final fallback: use the BUNDLE_ID extracted from the provisioning profile (available as environment variable $BUNDLE_ID)
+  FINAL_BUNDLE_ID="${PROJECT_BUNDLE_ID:-$BUNDLE_ID}"
+  
+  if [ -z "$FINAL_BUNDLE_ID" ]; then
+    echo "::error title=Bundle id missing::Could not determine PRODUCT_BUNDLE_IDENTIFIER"
+    exit 1
+  fi
+  
+  echo "BUNDLE_ID=$FINAL_BUNDLE_ID" >> "$GITHUB_ENV"
+  echo "Bundle identifier detected: $FINAL_BUNDLE_ID"
+  shell: /bin/bash -e {0}
+  env:
+    IOS_TEAM_ID: ***
+    P12_BASE64: ***
+  
+    P12_PASSWORD: ***
+    PROVISIONING_PROFILE_BASE64: ***
+  
+    SCHEME: java_offline
+    PROJECT: java_offline.xcodeproj
+    MD_APPLE_SDK_ROOT: /Applications/Xcode_26.0.1.app
+    PP_UUID: 61b87cc2-48b4-4124-a874-e879a46c9efb
+    PP_NAME: java offline provision profile
+    BUNDLE_ID: 
+Error: Could not determine PRODUCT_BUNDLE_IDENTIFIER
+Error: Process completed with exit code 1.
+0s
+0s
+0s
+0s
+0s
+0s
+1s
+
